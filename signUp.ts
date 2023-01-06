@@ -10,6 +10,9 @@ import {
   query,
   orderByChild,
   equalTo,
+  update,
+  push,
+  remove,
 } from "firebase/database";
 import firebaseAdmin from "firebase-admin";
 
@@ -59,7 +62,7 @@ class signupFirebaseHelper {
       })
         .then((r) => {
           // Data saved successfully!
-          // console.log("r");
+          console.log("r",r);
         })
         .catch((error) => {
           // The write failed...
@@ -71,7 +74,7 @@ class signupFirebaseHelper {
       const starCountRef = ref(db, "users/" + 1);
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
-        console.log("data",data);
+        console.log("data-snao", data);
       });
 
       get(child(ref(getDatabase()), `users/${userId}`)).then((snapshot) => {
@@ -94,12 +97,28 @@ class signupFirebaseHelper {
           console.log("qqqq", snapshot.toJSON());
         });
 
+      const newPostKey = push(child(ref(db), "users")).key;
 
+      // update query a db-> collection
+      const updates: any = {};
+
+      updates["users/1"] = { key2: "baluewww", 1: "balue" };
+
+      update(ref(db), updates)
+        .then((re) => {
+          console.log("data-upda", re);
+        })
+        .catch((e) => {
+          console.log("e", e);
+        });
+
+      // remove query
+      // users/userid/key
+      remove(ref(db, "users/1/1"));
     } catch (error) {
       console.log(error);
     }
   }
-
 }
 
 const signupFire = new signupFirebaseHelper();
