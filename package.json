@@ -5,7 +5,7 @@
   "main": "signUp.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --ext js,ts --exec ts-node ./signUp.ts"
+    "dev": "nodemon --ext js,ts --exec ts-node ./signUpV2.ts"
   },
   "keywords": [],
   "author": "",
