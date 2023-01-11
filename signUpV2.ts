@@ -32,7 +32,6 @@ const init = firebaseAdmin.initializeApp({
 
 const firebaseDB = init.database();
 
-
 interface UserInterface {
   email: string;
   userId: string;
@@ -45,16 +44,16 @@ interface EmailResltInterface {
 }
 
 class signupFirebaseHelper {
-  public userWithUserid = firebaseDB.ref("users");
+  public userRef = firebaseDB.ref("users");
 
   async Signup(user: UserInterface) {
     try {
-      const { key, value }: any = await this.findUserByEmail(user);
-      console.log("key", key);
+      const { data, userid }: any = await this.findUserByEmail(user);
+      console.log("key", userid);
 
-      if (value) {
-        console.log("r", value);
-        await this.updateUserInfo(key);
+      if (data.email) {
+        console.log("r", data.email);
+        await this.updateUserInfo(userid);
         return;
       }
 
@@ -74,34 +73,35 @@ class signupFirebaseHelper {
   }
 
   private async findUserByEmail(user: UserInterface) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const { userId, email } = user;
-      this.userWithUserid
+      const hedShot = await this.userRef
         .orderByChild("email")
         .equalTo(email)
-        .on("value", async (snapshot) => {
-          if (snapshot.val()) {
-            console.log("keyValueArray", snapshot.toJSON());
-            const keyValueArray = Object.entries(snapshot.val());
-            console.log("keyValueArray", keyValueArray);
-            keyValueArray.map(([key, value]) => {
-              resolve({ key, value });
-            });
-          }
-          reject(false);
-        });
+        .once("value");
+      if (!hedShot.val()) {
+        reject(false);
+      }
+      console.log("keyValueArray", hedShot.toJSON());
+      const keyValueArray = Object.entries(hedShot.val());
+      console.log("keyValueArray", keyValueArray);
+      const snap: any = hedShot.toJSON();
+      for (const userid in hedShot.toJSON()) {
+        console.log("ddd=", snap[userid]);
+        resolve({ data: snap[userid], userid });
+      }
     });
   }
 
   private async findUserByPhone(user: UserInterface) {
     return new Promise((resolve, reject) => {
       const { mobile } = user;
-      this.userWithUserid
+      this.userRef
         .orderByChild("mobile")
         .equalTo(mobile)
         .on("value", async (snapshot) => {
           if (snapshot.val()) {
-            const keyValueArray = Object.entries(snapshot.val());            
+            const keyValueArray = Object.entries(snapshot.val());
             keyValueArray.map(([key, value]) => {
               resolve(value);
             });
